@@ -1,31 +1,42 @@
-# 1. 导入我们要用的工具
-import re  # re 是正则表达式工具，用来找规律
-import pandas as pd  # pandas 是数据表格工具，起个外号叫 pd
+import os
+import json
+from openai import OpenAI
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from prompts.extract_prompt import EXTRACT_PROMPT
 
-# 2. 读取昨天生成的文本文件
-with open("output.txt", "r", encoding="utf-8") as f:
-    text = f.read()
+client = OpenAI(
+    api_key="sk-85af704693254f27adc949726a1d9ec9",
+    base_url="https://api.deepseek.com"
+)
 
-# 3. 定义“筛子”（正则表达式）
-# 下面的规则意思是：找“数字 + 可能有的小数点 + 数字 + 单位(亿元/万元/%)”
-# \d 代表数字，+代表连续多个，\. 代表小数点，?代表可有可无
-# (亿元|万元|%) 代表这三个单位里匹配任意一个
-pattern = r'(\d+(?:\.\d+)?)\s*(亿元|万元|%)'
 
-# 4. 用筛子在全文里找所有符合条件的内容
-# findall 会把找到的所有东西变成一个列表
-matches = re.findall(pattern, text)
+def extract_financial_data(text):
+    """
+    核心函数：输入报告文本，输出结构化的金融数据 JSON
+    """
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "user", "content": EXTRACT_PROMPT.format(text=text)}
+            ],
+            response_format={"type": "json_object"}  # 强制返回JSON
+        )
+        result = json.loads(response.choices[0].message.content)
+        return result
+    except Exception as e:
+        print(f"抽取失败: {e}")
+        return []
 
-# 5. 把找到的数据转换成表格（DataFrame）
-# 我们给表格起两列名字：一个是“数值”，一个是“单位”
-df = pd.DataFrame(matches, columns=["数值", "单位"])
 
-# 6. 打印看看结果
-print("提取到的数据总共有：", len(df), "条")
-print("--- 下面是前 10 条数据 ---")
-print(df.head(10)) # head(10) 意思是只看前10行，免得太长刷屏
+if __name__ == "__main__":
+    # 测试用的一段模拟报告文本
+    test_text = "根据2024年年度报告，公司实现营业收入128.6亿元，同比增长15.3%。归属于上市公司股东的净利润为25.4亿元。"
 
-# 7. 保存成 CSV 文件（相当于 Excel 表格）
-# index=False 意思是不要自动生成序号，encoding="utf-8-sig" 是为了让Excel打开不乱码
-df.to_csv("extracted_data.csv", index=False, encoding="utf-8-sig")
-print("\n成功！请去左侧文件夹查看 extracted_data.csv 文件。")
+    print("正在调用大模型抽取...")
+    results = extract_financial_data(test_text)
+
+    print("\n抽取结果：")
+    print(json.dumps(results, ensure_ascii=False, indent=2))
