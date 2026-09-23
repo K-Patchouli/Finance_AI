@@ -2,8 +2,8 @@
 import pdfplumber
 
 # 2. 定义输入和输出的文件名
-input_pdf = "../data/annual_report.pdf"
-output_txt = "../data/output.txt"
+input_pdf = "data/annual_report.pdf"
+output_txt = "data/output.txt"
 
 # 3. 打开PDF
 with pdfplumber.open(input_pdf) as pdf:

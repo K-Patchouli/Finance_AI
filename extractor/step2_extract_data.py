@@ -22,7 +22,7 @@ def extract_financial_data(text):
             messages=[
                 {"role": "user", "content": EXTRACT_PROMPT.format(text=text)}
             ],
-            response_format={"type": "json_object"}  # 强制返回JSON
+            response_format={"type": "json_object"}
         )
         result = json.loads(response.choices[0].message.content)
         return result
@@ -32,11 +32,18 @@ def extract_financial_data(text):
 
 
 if __name__ == "__main__":
-    # 测试用的一段模拟报告文本
-    test_text = "根据2024年年度报告，公司实现营业收入128.6亿元，同比增长15.3%。归属于上市公司股东的净利润为25.4亿元。"
+    with open("data/output.txt", "r", encoding="utf-8") as f:
+        full_text = f.read()
+    pages = full_text.split("==========")
 
-    print("正在调用大模型抽取...")
-    results = extract_financial_data(test_text)
+    all_results = []
+    for page in pages:
+        if page.strip():
+            print(f"正在抽取第 {len(all_results) + 1} 页...")
+            results = extract_financial_data(page)
+            if results:
+                all_results.extend(results)
+    with open("extracted_data.json", "w", encoding="utf-8") as f:
+        json.dump(all_results, f, ensure_ascii=False, indent=2)
 
-    print("\n抽取结果：")
-    print(json.dumps(results, ensure_ascii=False, indent=2))
+    print(f"\n成功抽取 {len(all_results)} 条财务数据，已保存到 extracted_data.json")
