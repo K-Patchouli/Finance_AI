@@ -1,0 +1,14 @@
+# 忽略所有PDF文件（体积太大，GitHub存不下）
+*.pdf
+
+# 忽略虚拟环境（这是你个人的定制环境，绝不能传给队友）
+.venv/
+venv/
+
+# 忽略Python运行时自动生成的缓存文件夹
+__pycache__/
+*.pyc
+
+# 忽略提取出来的中间文件（可以共享，但容易冲突，建议忽略）
+output.txt
+financial_data.csv

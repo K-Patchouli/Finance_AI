@@ -1,8 +1,14 @@
+import os
 import pandas as pd
 
-# 1. 读取刚才清洗好的数据表格
-df = pd.read_csv("../logs/financial_data.csv")
+# 获取当前脚本(step4)所在的文件夹（也就是 checker）
+当前文件夹 = os.path.dirname(os.path.abspath(__file__))
+# 往上一级，找到项目根目录 (Finance_AI)
+项目根目录 = os.path.dirname(当前文件夹)
+# 拼接出正确的 CSV 路径
+csv路径 = os.path.join(项目根目录, "logs", "financial_data.csv")
 
+df = pd.read_csv(csv路径)
 # 2. 数据清洗：去掉逗号，转为真正的浮点数（数字）
 # 大白话：把 "53,909,252,220.51" 变成 53909252220.51，方便做数学计算
 df["数值_纯数字"] = df["数值"].astype(str).str.replace(",", "", regex=False).astype(float)
