@@ -11,4 +11,4 @@ __pycache__/
 
 # 忽略提取出来的中间文件（可以共享，但容易冲突，建议忽略）
 output.txt
-financial_data.csv
+financial_data.csv.venv/
