@@ -9,6 +9,14 @@ venv/
 __pycache__/
 *.pyc
 
-# 忽略提取出来的中间文件（可以共享，但容易冲突，建议忽略）
+# 忽略提取出来的中间文件（容易冲突，建议忽略）
 output.txt
-financial_data.csv.venv/
+financial_data.csv
+extracted_data.json
+
+# 忽略IDE配置文件（比如PyCharm或VSCode生成的本地配置）
+.idea/
+.vscode/
+
+# 忽略操作系统自动生成的垃圾文件（比如Mac的.DS_Store）
+.DS_Store
